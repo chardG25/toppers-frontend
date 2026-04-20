@@ -12,6 +12,7 @@ CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -21,24 +22,56 @@ export const LoginForm = ()=> {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
-  const handleSubmit = async (e: React.BaseSyntheticEvent) => {
-    e.preventDefault()
+  // const handleSubmit = async (e: React.BaseSyntheticEvent) => {
+  //   e.preventDefault()
     
-    const res = await fetch("http://localhost:3001/api/auth/login", {
-      method: "POST",
-      headers: {"Content-type": "application/json"},
-      body: JSON.stringify({username, password})
-    })
+  //   const res = await fetch("http://localhost:3001/api/auth/login", {
+  //     method: "POST",
+  //     headers: {"Content-type": "application/json"},
+  //     body: JSON.stringify({username, password})
+  //   })
 
-    const data =  await res.json()
+  //   const data =  await res.json()
 
-    if (res.ok) {
-      router.push("/store")
-    }
-    else {
-      setError(data.error || "Invalid Credentials")
-    }
+  //   if (res.ok) {
+  //     router.push("/users")
+  //   }
+  //   else {
+  //     setError(data.error || "Invalid Credentials")
+  //   }
 
+  // }
+
+  const loginMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("http://localhost:3001/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Invalid Credentials")
+      }
+
+      return data
+    },
+    onSuccess: () => {
+      router.push("/users")
+    },
+    onError: (err) => {
+      setError(err.message)
+    },
+  })
+
+
+  const handleSubmit = (e: React.BaseSyntheticEvent) => {
+    e.preventDefault()
+    loginMutation.mutate()
   }
 
 return (

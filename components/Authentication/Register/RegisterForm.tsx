@@ -12,6 +12,7 @@ CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -22,24 +23,65 @@ export const RegisterForm = () => {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
  
-  const handleSubmit = async (e: React.BaseSyntheticEvent) => {
-    e.preventDefault()
+  // const handleSubmit = async (e: React.BaseSyntheticEvent) => {
+  //   e.preventDefault()
 
-    const res = await fetch("http://localhost:3001/api/auth/register",
-     {method: "POST", 
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username, password})
-     })
+  //   const res = await fetch("http://localhost:3001/api/auth/register",
+  //    {method: "POST", 
+  //     headers: {"Content-Type": "application/json"},
+  //     body: JSON.stringify({username, password})
+  //    })
 
-     const data = await res.json()
+  //    const data = await res.json()
 
-     if (res.ok) {
+  //    if (res.ok) {
+  //     router.push("/login")
+  //    }
+  //    else {
+  //     setError(data.error || "Registration Failed")
+  //    }
+  // }
+
+
+  const mutation = useMutation({
+    mutationFn: async (credentials: { username: string, password: string }) => {
+      // mutationFn = the actual fetch function
+      // receives the data you pass to mutation.mutate()
+
+      const res = await fetch("http://localhost:3001/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials)
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Registration Failed")
+        // throw = triggers onError below
+      }
+
+      return data
+      // return = triggers onSuccess below
+    },
+
+    onSuccess: () => {
+      // runs when mutationFn returns successfully
       router.push("/login")
-     }
-     else {
-      setError(data.error || "Registration Failed")
-     }
+    },
+
+    onError: (error: Error) => {
+      // runs when mutationFn throws an error
+      setError(error.message)
+    }
+  })
+
+  const handleSubmit = (e: React.BaseSyntheticEvent) => {
+    e.preventDefault()
+    mutation.mutate({ username, password })
+    // .mutate() triggers mutationFn with the passed data
   }
+
 
 return (
 <div className="flex flex-1 justify-center items-center">
