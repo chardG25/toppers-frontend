@@ -1,22 +1,23 @@
 "use client"
-import { useQueryClient } from "@tanstack/react-query"
+import { fetchUsers } from "@/services/users"
+import { useQuery } from "@tanstack/react-query"
 type User = {
   id: number
   username: string
 }
 
-
 export const Toppers = () => {
-  const queryClient = useQueryClient()
-
-
-  const users = queryClient.getQueryData<User[]>(["users"])
-  console.log("cache at render:", users)
+  const userQuery = useQuery<User[]>({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+    networkMode: 'offlinefirst'
+  })
+  
 
   return (
     <div className="bg-red-500">
-      {users ? (
-        <ul>{users.map(user => <li key={user.id}>{user.username}</li>)}</ul>
+      {userQuery.data ? (
+        <ul>{userQuery.data.map(user => <li key={user.id}>{user.username}</li>)}</ul>
       ) : (
         <p>No cache</p>
       )}

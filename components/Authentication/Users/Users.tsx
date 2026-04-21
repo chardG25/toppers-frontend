@@ -1,6 +1,7 @@
 "use client"
 
-import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
+import { fetchUsers } from "@/services/users"
+import {useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 
 type User = {
@@ -9,25 +10,25 @@ type User = {
 }
 
 export const Users  = () => {
-  
-
-  const {isLoading, error, data} = useQuery<User[]>({
+  const userQuery = useQuery<User[]>({
     queryKey: ["users"],
-    queryFn: () => fetch("http://localhost:3001/api/auth/index").then((res)=>res.json())
+    queryFn: fetchUsers,
+    staleTime: 1000 * 60 * 1,
+    gcTime: 1000 * 60 * 1
   })
 
-  if (isLoading) return "Loading.."
-  if (error) return "An Error occured" + error.message
+  if (userQuery.isLoading) return "Loading.."
+  if (userQuery.error) return "An Error occured" + userQuery.error.message
 
   
   return (
 
   <div>
     <ul>
-      {data?.map((user)=>(<li key={user.id}>{user.username}</li>))}
+      {userQuery.data?.map((user)=>(<li key={user.id}>{user.username}</li>))}
     </ul>
 
-      <Link href="/store">Go to Store</Link>
+    <Link href="/store">Go to Store</Link>
   </div>
   )
 }
