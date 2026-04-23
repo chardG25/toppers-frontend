@@ -1,8 +1,19 @@
-export const fetchUsers = () => {
-  return fetch("http://localhost:3001/api/auth/index").then((res) => res.json())
+export const fetchUsers = async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch("http://localhost:3001/api/auth/index", 
+    {headers: {"Authorization": `Bearer ${token}`}}
+  )
+
+  const data = await res.json()
+
+  if (!res.ok || data.error) {
+    throw new Error(data.error || "Unauthorized");
+  }
+
+  return data
 }
 
-export const fetchUser = () => {}
 
 export const createUser = () => {}
 

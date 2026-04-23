@@ -18,7 +18,7 @@ export const Users  = () => {
   })
 
   if (userQuery.isLoading) return "Loading.."
-  if (userQuery.error) return "An Error occured" + userQuery.error.message
+  if (userQuery.error) return "An Error occured " + userQuery.error.message
 
   
   return (

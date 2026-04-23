@@ -10,7 +10,7 @@ export const Toppers = () => {
   const userQuery = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: fetchUsers,
-    networkMode: 'offlinefirst'
+  
   })
   
 

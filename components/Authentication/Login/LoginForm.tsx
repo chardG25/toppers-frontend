@@ -60,7 +60,9 @@ export const LoginForm = ()=> {
 
       return data
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token)
+
       router.push("/users")
     },
     onError: (err) => {
